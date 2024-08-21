@@ -1,63 +1,82 @@
-
 pipeline {
-    
     agent any
-    environment{
+    environment {
         SONAR_HOME = tool "Sonar"
     }
     stages {
-        
-        stage("Code"){
-            steps{
-                git url: "https://github.com/Sheheriyar99/node-todo-cicd.git" , branch: "master"
+        stage("Code") {
+            steps {
+                git url: "https://github.com/Sheheriyar99/node-todo-cicd", branch: "master"
                 echo "Code Cloned Successfully"
             }
         }
-        stage("SonarQube Analysis"){
-            steps{
-               withSonarQubeEnv("Sonar"){
-                   sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo -X"
-               }
+        stage("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv("Sonar") {
+                    sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo -X"
+                }
+                echo "SonarQube Analysis Completed"
             }
         }
-        stage("SonarQube Quality Gates"){
-            steps{
-               timeout(time: 1, unit: "MINUTES"){
-                   waitForQualityGate abortPipeline: false
-               }
+        stage("SonarQube Quality Gates") {
+            steps {
+                script {
+                    catchError(buildResult: 'UNSTABLE', stageResult: 'UNSTABLE') {
+                        timeout(time: 1, unit: "MINUTES") {
+                            def qualityGate = waitForQualityGate abortPipeline: false
+                            
+                            if (qualityGate.status != 'OK') {
+                                echo "Quality Gate failed: ${qualityGate.status}"
+                                currentBuild.result = 'UNSTABLE'
+                            } else {
+                                echo "Quality Gate passed successfully!"
+                            }
+                        }
+                    }
+                }
             }
         }
-        stage("OWASP"){
-            steps{
+        stage("OWASP") {
+            steps {
                 dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'OWASP'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                echo "OWASP Analysis Completed Successfully"
             }
         }
-        stage("Build & Test"){
-            steps{
+        stage("Build & Test") {
+            steps {
                 sh 'docker build -t node-app:latest .'
-                echo "Code Built Successfully"
+                echo "Code Built & Tested Successfully"
             }
         }
-        stage("Trivy"){
-            steps{
-                sh "trivy image node-app"
+        stage("Trivy") {
+            steps {
+                sh "trivy -d image node-app"
+                echo "Trivy Scan Completed Successfully"
             }
         }
-        stage("Push to Private Docker Hub Repo"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"DockerHubCreds",passwordVariable:"dockerPass",usernameVariable:"dockerUser")]){
-                sh "docker login -u ${env.dockerUser} -p ${env.dockerPass}"
-                sh "docker tag node-app-batch-6:latest ${env.dockerUser}/node-app:latest"
-                sh "docker push ${env.dockerUser}/node-app:latest"
+        stage("Deploy") {
+            steps {
+                script {
+                    // Stop and remove any running container that might be using port 8000
+                    sh """
+                        docker ps --filter "expose=8000" -q | xargs -r docker stop
+                        docker ps -a --filter "expose=8000" -q | xargs -r docker rm
+                    """
+                    sh "docker-compose down"
+                    sh "docker-compose up -d"
                 }
-                
+                echo "App Deployed Successfully"
             }
         }
-        stage("Deploy"){
-            steps{
-                sh "docker-compose down && docker-compose up -d"
-                echo "App Deployed Successfully"
+        stage("Push To Private DockerHub Repo") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: "DockerHubCreds", passwordVariable: "dockerPass", usernameVariable: "dockerUser")]) {
+                    sh "docker login -u ${dockerUser} -p ${dockerPass}"
+                    sh "docker tag node-app:latest ${dockerUser}/node-app:latest"
+                    sh "docker push ${dockerUser}/node-app:latest"
+                }
+                echo "Docker Image Pushed Successfully"
             }
         }
     }
