@@ -64,7 +64,7 @@ pipeline {
                         docker ps -a --filter "expose=8000" -q | xargs -r docker rm
                     """
                     sh "docker-compose down"
-                    sh "docker-compose up -d"
+                    sh "----"
                 }
                 echo "App Deployed Successfully"
             }
