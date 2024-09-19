@@ -1,14 +1,17 @@
 version: 0.0
 os: linux
+
 files:
   - source: /
     destination: /home/ubuntu/node-app
+
 hooks:
   AfterInstall:
-    - location: start_containers.sh
+    - location: docker-start.sh  # Script to start Docker containers
       timeout: 300
       runas: root
+
   ApplicationStart:
-    - location: start_app.sh
+    - location: docker-deploy.sh  # Script to deploy Docker containers
       timeout: 300
       runas: root
