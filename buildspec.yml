@@ -5,7 +5,7 @@ phases:
     commands:
       - echo "Cloning the code"
       - git clone https://github.com/Sheheriyar99/node-todo-cicd.git
-      - cd node-app
+      - cd node-todo-cicd
 
   build:
     commands:
