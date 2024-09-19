@@ -12,12 +12,6 @@ phases:
       - echo "Building Docker image"
       - docker build -t node-app:latest .
 
-  post_build:
-    commands:
-      - echo "Deploying the container"
-      - docker-compose down
-      - docker-compose up -d
-
 artifacts:
   files:
     - '**/*'  # Include all files, or you can specify particular files or directories
