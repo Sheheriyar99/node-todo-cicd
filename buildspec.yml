@@ -1,26 +1,25 @@
 version: 0.2
 
 phases:
-  install:
-    commands:
-      - echo "Installing dependencies..."
-      - apt-get update
-      - apt-get install -y docker
-      - curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-      - chmod +x /usr/local/bin/docker-compose
-
   pre_build:
     commands:
-      - echo "Cloning the repository..."
-      - git clone https://github.com/Sheheriyar99/node-todo-cicd
-      - cd node-todo-cicd
+      - echo "Cloning the code"
+      - git clone https://github.com/Sheheriyar99/node-todo-cicd.git
+      - cd node-app
 
   build:
     commands:
-      - echo "Building and testing the Docker image..."
+      - echo "Building Docker image"
       - docker build -t node-app:latest .
-      - echo "Build & Test completed successfully."
+
+  post_build:
+    commands:
+      - echo "Deploying the container"
+      - docker-compose down
+      - docker-compose up -d
 
 artifacts:
   files:
-    - '**/*'
+    - '**/*'  # Include all files, or you can specify particular files or directories
+  base-directory: 'node-app'  # This ensures artifacts are gathered from the right directory
+  discard-paths: yes  # You can set this to 'no' if you want to preserve the file paths in the S3 bucket
