@@ -1,28 +1,11 @@
 #!/bin/bash
 
-# Change to the node-app directory
-cd /home/ubuntu/node-app || { echo "Directory /home/ubuntu/node-app does not exist."; exit 1; }
-
-# Check if Docker is running
+# Start Docker if it's not already running
+echo "Checking if Docker is running..."
 if ! systemctl is-active --quiet docker; then
-    echo "Docker is not running. Starting Docker..."
-    sudo systemctl start docker
-fi
-
-# Check if Docker Compose is installed
-if ! command -v docker-compose &> /dev/null; then
-    echo "Docker Compose could not be found. Please install Docker Compose."
-    exit 1
-fi
-
-# Bring up the containers using Docker Compose
-echo "Starting Docker containers..."
-docker-compose up -d
-
-# Check if containers started successfully
-if [ $? -eq 0 ]; then
-    echo "Containers started successfully."
+  echo "Docker is not running, starting Docker..."
+  sudo systemctl start docker
+  echo "Docker started."
 else
-    echo "Error occurred while starting containers."
-    exit 1
+  echo "Docker is already running."
 fi
