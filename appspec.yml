@@ -1,0 +1,18 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /home/ubuntu/node-app
+hooks:
+  BeforeInstall:
+    - location: stop_containers.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: start_containers.sh
+      timeout: 300
+      runas: root
+  ApplicationStart:
+    - location: start_app.sh
+      timeout: 300
+      runas: root
