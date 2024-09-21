@@ -3,9 +3,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo "Cloning the code"
-      - git clone https://github.com/Sheheriyar99/node-todo-cicd.git
-      - cd node-todo-cicd
+      
 
   build:
     commands:
