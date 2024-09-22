@@ -10,13 +10,14 @@ phases:
   pre_build:
     commands:
       - echo "Logging into Docker registry"
-   #   - echo "Username: $DOCKER_REGISTRY_USERNAME"  # Be careful with this in production
-      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$DOCKER_REGISTRY_URL" --username --password-stdin
+      - sudo apt-get install docker.io -y
+      - sudo systemctl start docker
+      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login -u "$DOCKER_REGISTRY_USERNAME" -p "$DOCKER_REGISTRY_PASSWORD"
 
   build:
     commands:
       - echo "Building Docker image"
-      - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest" .
+      - docker build -t Sheheriyar99/node-app:latest .
       - echo "Pushing Docker image"
       - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest"
 
