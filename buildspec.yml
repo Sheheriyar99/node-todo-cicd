@@ -15,8 +15,9 @@ phases:
     commands:
       - echo "Building Docker image"
       - docker build -t "$DOCKER_RESGISTRY_URL/$DOCKER_RESGISTRY_USERNAME/node-app:latest" .
-      - docker login -u "$RESGISTRY_USERNAME" -p "$DOCKER_RESGISTRY_PASSWORD"
+      - docker login -u "$DOCKER_RESGISTRY_USERNAME" -p "$DOCKER_RESGISTRY_PASSWORD"
       - docker push "$DOCKER_RESGISTRY_URL/$DOCKER_RESGISTRY_USERNAME/node-app:latest" 
+      
 
 artifacts:
   files:
