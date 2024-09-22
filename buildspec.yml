@@ -10,6 +10,7 @@ phases:
   pre_build:
     commands:
       - echo "Logging into Docker registry"
+      - echo "Username: $DOCKER_REGISTRY_USERNAME"  # Be careful with this in production
       - echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$DOCKER_REGISTRY_URL" -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
 
   build:
@@ -21,5 +22,5 @@ phases:
 
 artifacts:
   files:
-    - '**/*'  # Include all files, or you can specify particular files or directories
-  discard-paths: yes  # You can set this to 'no' if you want to preserve the file paths in the S3 bucket
+    - '**/*'  
+  discard-paths: yes  
