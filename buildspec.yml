@@ -9,13 +9,13 @@ env:
 phases:
   pre_build:
     commands:
-    #  - echo "Logging into Docker registry"
-     # - docker login -u "$DOCKER_REGISTRY_USERNAME" -p --password-stdin
+      - echo "Logging into Docker registry"
+      - echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$DOCKER_REGISTRY_URL" -u "$DOCKER_REGISTRY_USERNAME" --password-stdin
 
   build:
     commands:
       - echo "Building Docker image"
-      - docker build -t Sheheriyar99/node-app:latest .
+      - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest" .
       - echo "Pushing Docker image"
       - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest"
 
