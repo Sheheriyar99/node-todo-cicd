@@ -9,8 +9,8 @@ env:
 phases:
   pre_build:
     commands:
-      - echo "Logging into Docker registry"
-      - docker login -u "$DOCKER_REGISTRY_USERNAME" -p --password-stdin
+     # - echo "Logging into Docker registry"
+     # - docker login -u "$DOCKER_REGISTRY_USERNAME" -p --password-stdin
 
   build:
     commands:
