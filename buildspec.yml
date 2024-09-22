@@ -9,15 +9,15 @@ env:
 phases:
   pre_build:
     commands:
-      
+      - echo "Logging into Docker registry"
+      - docker login -u "$DOCKER_REGISTRY_USERNAME" -p "$DOCKER_REGISTRY_PASSWORD"
 
   build:
     commands:
       - echo "Building Docker image"
       - docker build -t "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest" .
-      - docker login -u "$DOCKER_REGISTRY_USERNAME" -p "$DOCKER_REGISTRY_PASSWORD"
-      - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest" 
-      
+      - echo "Pushing Docker image"
+      - docker push "$DOCKER_REGISTRY_URL/$DOCKER_REGISTRY_USERNAME/node-app:latest"
 
 artifacts:
   files:
