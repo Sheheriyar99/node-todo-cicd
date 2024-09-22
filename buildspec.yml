@@ -1,4 +1,10 @@
-version: 0.2
+version: 0.2  
+
+env:
+  parameter_store:
+    DOCKER_RESGISTRY_USERNAME: /docker/username
+    DOCKER_RESGISTRY_PASSWORD: /docker/password
+    DOCKER_RESGISTRY_URL: /docker-registry/url
 
 phases:
   pre_build:
@@ -8,7 +14,9 @@ phases:
   build:
     commands:
       - echo "Building Docker image"
-      - docker build -t node-app:latest .
+      - docker build -t "$DOCKER_RESGISTRY_URL/$DOCKER_RESGISTRY_USERNAME/node-app:latest" .
+      - docker login -u "$RESGISTRY_USERNAME" -p "$DOCKER_RESGISTRY_PASSWORD"
+      - docker push "$DOCKER_RESGISTRY_URL/$DOCKER_RESGISTRY_USERNAME/node-app:latest" 
 
 artifacts:
   files:
